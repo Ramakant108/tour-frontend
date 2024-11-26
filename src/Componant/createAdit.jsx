@@ -14,14 +14,19 @@ const CreateTourForm = ({ user }) => {
     duration_unit: 'days', // Default to "days"
   });
 
+  const [loading,setLoading]=useState(false)
+
   const navigate = useNavigate();
   const { id } = useParams();
  
 
   useEffect(() => {
     const getdetail = async () => {
+      setLoading(true)
       const res = await axios.get(`https://tour-backend-1wsb.onrender.com/tours/${user.id}/update/${id}`);
+      setLoading(false)
       setTourData(res.data[0]);
+      
       console.log(res.data)
     };
     console.log(id)
@@ -43,10 +48,12 @@ const CreateTourForm = ({ user }) => {
     e.preventDefault();
     if (!id) {
       try {
+        setLoading(true)
         const res = await axios.post("https://tour-backend-1wsb.onrender.com/tours", {
           Uid: user.id,
           ...tourData,
         });
+        setLoading(false)
         toast.success(res.data.message);
         navigate('/');
       } catch (error) {
@@ -54,10 +61,12 @@ const CreateTourForm = ({ user }) => {
       }
     } else {
       try {
+        setLoading(true)
         const res = await axios.put(`https://tour-backend-1wsb.onrender.com/tours/${id}`, {
           Uid: user.id,
           ...tourData,
         });
+        setLoading(false)
         toast.success(res.data.message);
         navigate('/');
       } catch (error) {
@@ -67,115 +76,122 @@ const CreateTourForm = ({ user }) => {
   };
 
   return (
-    <div className="container mt-5">
-      {/* Back Button */}
-      <div className="mb-4">
-        <button className="btn btn-secondary" onClick={() => navigate('/')}>
-          &larr; Back
-        </button>
-        
+    loading?( <div className="d-flex justify-content-center align-items-center vh-100">
+      <div className="spinner-border text-primary" role="status">
+        <span className="visually-hidden">Loading...</span>
       </div>
-      <div className="card p-4 shadow-sm" style={{ maxWidth: '600px', margin: '0 auto' }}>
-        <h2 className="text-center">{id ? "Update Tour" : "Create Tour"}</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-3">
-            <label htmlFor="title" className="form-label">Title</label>
-            <input
-              type="text"
-              className="form-control"
-              id="title"
-              name="title"
-              value={tourData.title}
-              onChange={handleChange}
-              placeholder="Enter tour title"
-              required
-            />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="description" className="form-label">Description</label>
-            <textarea
-              className="form-control"
-              id="description"
-              name="description"
-              value={tourData.description}
-              onChange={handleChange}
-              rows="3"
-              placeholder="Enter tour description"
-              required
-            ></textarea>
-          </div>
-          <div className="mb-3">
-            <label htmlFor="pick_up" className="form-label">Pick-Up Location</label>
-            <input
-              type="text"
-              className="form-control"
-              id="pick_up"
-              name="pick_up"
-              value={tourData.pick_up}
-              onChange={handleChange}
-              placeholder="Enter pick-up location"
-              required
-            />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="meeting_point" className="form-label">Meeting Point</label>
-            <input
-              type="text"
-              className="form-control"
-              id="meeting_point"
-              name="meeting_point"
-              value={tourData.meeting_point}
-              onChange={handleChange}
-              placeholder="Enter meeting point"
-              required
-            />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="drop_off" className="form-label">Drop-Off Location</label>
-            <input
-              type="text"
-              className="form-control"
-              id="drop_off"
-              name="drop_off"
-              value={tourData.drop_off}
-              onChange={handleChange}
-              placeholder="Enter drop-off location"
-              required
-            />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="duration" className="form-label">Duration</label>
-            <input
-              type="number"
-              step="0.1"
-              className="form-control"
-              id="duration"
-              name="duration"
-              value={tourData.duration}
-              onChange={handleChange}
-              placeholder="Enter duration"
-              required
-            />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="duration_unit" className="form-label">Duration Unit</label>
-            <select
-              className="form-select"
-              id="duration_unit"
-              name="duration_unit"
-              value={tourData.duration_unit}
-              onChange={handleChange}
-              required
-            >
-              <option value="hours">Hours</option>
-              <option value="days">Days</option>
-              <option value="weeks">Weeks</option>
-            </select>
-          </div>
-          <button type="submit" className="btn btn-primary w-100">{id ? "Update" : "Create"}</button>
-        </form>
-      </div>
-    </div>
+    </div>):(
+       <div className="container mt-5">
+       {/* Back Button */}
+       <div className="mb-4">
+         <button className="btn btn-secondary" onClick={() => navigate('/')}>
+           &larr; Back
+         </button>
+         
+       </div>
+       <div className="card p-4 shadow-sm" style={{ maxWidth: '600px', margin: '0 auto' }}>
+         <h2 className="text-center">{id ? "Update Tour" : "Create Tour"}</h2>
+         <form onSubmit={handleSubmit}>
+           <div className="mb-3">
+             <label htmlFor="title" className="form-label">Title</label>
+             <input
+               type="text"
+               className="form-control"
+               id="title"
+               name="title"
+               value={tourData.title}
+               onChange={handleChange}
+               placeholder="Enter tour title"
+               required
+             />
+           </div>
+           <div className="mb-3">
+             <label htmlFor="description" className="form-label">Description</label>
+             <textarea
+               className="form-control"
+               id="description"
+               name="description"
+               value={tourData.description}
+               onChange={handleChange}
+               rows="3"
+               placeholder="Enter tour description"
+               required
+             ></textarea>
+           </div>
+           <div className="mb-3">
+             <label htmlFor="pick_up" className="form-label">Pick-Up Location</label>
+             <input
+               type="text"
+               className="form-control"
+               id="pick_up"
+               name="pick_up"
+               value={tourData.pick_up}
+               onChange={handleChange}
+               placeholder="Enter pick-up location"
+               required
+             />
+           </div>
+           <div className="mb-3">
+             <label htmlFor="meeting_point" className="form-label">Meeting Point</label>
+             <input
+               type="text"
+               className="form-control"
+               id="meeting_point"
+               name="meeting_point"
+               value={tourData.meeting_point}
+               onChange={handleChange}
+               placeholder="Enter meeting point"
+               required
+             />
+           </div>
+           <div className="mb-3">
+             <label htmlFor="drop_off" className="form-label">Drop-Off Location</label>
+             <input
+               type="text"
+               className="form-control"
+               id="drop_off"
+               name="drop_off"
+               value={tourData.drop_off}
+               onChange={handleChange}
+               placeholder="Enter drop-off location"
+               required
+             />
+           </div>
+           <div className="mb-3">
+             <label htmlFor="duration" className="form-label">Duration</label>
+             <input
+               type="number"
+               step="0.1"
+               className="form-control"
+               id="duration"
+               name="duration"
+               value={tourData.duration}
+               onChange={handleChange}
+               placeholder="Enter duration"
+               required
+             />
+           </div>
+           <div className="mb-3">
+             <label htmlFor="duration_unit" className="form-label">Duration Unit</label>
+             <select
+               className="form-select"
+               id="duration_unit"
+               name="duration_unit"
+               value={tourData.duration_unit}
+               onChange={handleChange}
+               required
+             >
+               <option value="hours">Hours</option>
+               <option value="days">Days</option>
+               <option value="weeks">Weeks</option>
+             </select>
+           </div>
+           <button type="submit" className="btn btn-primary w-100">{id ? "Update" : "Create"}</button>
+         </form>
+       </div>
+     </div>
+    )
+   
   );
 };
 

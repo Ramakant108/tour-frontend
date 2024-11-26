@@ -4,26 +4,33 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 
 const Home = ({ user }) => {
   const [tours, setTours] = useState([]);
+  const [loading,setLoading]=useState(false)
   const { title } = useParams();
   const navigate = useNavigate();
 
   const getdetail = async () => {
+    setLoading(true);
     const res = await axios.get(`https://tour-backend-1wsb.onrender.com/tours/${user.id}/${title}`);
     setTours(res.data);
+    setLoading(false)
     console.log(tours)
   };
 
   useEffect(() => {
     // console.log(user);
     const fetchdata = async () => {
+      setLoading(true);
       const data = await axios.get(`https://tour-backend-1wsb.onrender.com/tours/${user.id}`);
       setTours(data.data);
+      setLoading(false)
     };
+    
     if (title) {
       user && getdetail();
     } else {
       user && fetchdata();
     }
+    
   }, [title]);
 
 
@@ -39,60 +46,68 @@ const Home = ({ user }) => {
 
 
   return (
-    <div className="container mt-5">
-      {/* Back Button */}
-      <div className="mb-4">
-        {title? <button className="btn btn-secondary" onClick={() => navigate('/')}>
-          &larr; Back
-        </button>:<></>}
-       
-      </div>
-      <h2 className="text-center mb-4">{title ? "Searched Tours" : "All Tours"}</h2>
-      {tours.length > 0 ? (
-        <div className="row">
-          {tours.map((tour) => (
-            <div className="col-md-6 mb-4" key={tour.id}>
-              <div className="card shadow-sm">
-                <div className="card-body">
-                  <h5 className="card-title">{tour.title}</h5>
-                  <p className="card-text">
-                    <strong>Description:</strong> {tour.description}
-                  </p>
-                  <p className="card-text">
-                    <strong>Pick-Up:</strong> {tour.pick_up}
-                  </p>
-                  <p className="card-text">
-                    <strong>Meeting Point:</strong> {tour.meeting_point}
-                  </p>
-                  <p className="card-text">
-                    <strong>Drop-Off:</strong> {tour.drop_off}
-                  </p>
-                  <p className="card-text">
-                    <strong>Duration:</strong> {tour.duration} {tour.duration_unit}
-                  </p>
-                  <div className="d-flex justify-content-end">
-                    <Link to={`/update/${tour._id}`}>
-                      <button className="btn btn-warning me-2">Update</button>
-                    </Link>
 
-                    <button
-                      className="btn btn-danger"
-                      onClick={() => handleDelete(tour._id)}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
+      loading?( <div className="d-flex justify-content-center align-items-center vh-100">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
         </div>
-      ) : (
-        <div className="text-center">
-          <p>No tours available. Create one to get started!</p>
-        </div>
-      )}
-    </div>
+      </div>):(
+         <div className="container mt-5">
+         {/* Back Button */}
+         <div className="mb-4">
+           {title? <button className="btn btn-secondary" onClick={() => navigate('/')}>
+             &larr; Back
+           </button>:<></>}
+          
+         </div>
+         <h2 className="text-center mb-4">{title ? "Searched Tours" : "All Tours"}</h2>
+         {tours.length > 0 ? (
+           <div className="row">
+             {tours.map((tour) => (
+               <div className="col-md-6 mb-4" key={tour.id}>
+                 <div className="card shadow-sm">
+                   <div className="card-body">
+                     <h5 className="card-title">{tour.title}</h5>
+                     <p className="card-text">
+                       <strong>Description:</strong> {tour.description}
+                     </p>
+                     <p className="card-text">
+                       <strong>Pick-Up:</strong> {tour.pick_up}
+                     </p>
+                     <p className="card-text">
+                       <strong>Meeting Point:</strong> {tour.meeting_point}
+                     </p>
+                     <p className="card-text">
+                       <strong>Drop-Off:</strong> {tour.drop_off}
+                     </p>
+                     <p className="card-text">
+                       <strong>Duration:</strong> {tour.duration} {tour.duration_unit}
+                     </p>
+                     <div className="d-flex justify-content-end">
+                       <Link to={`/update/${tour._id}`}>
+                         <button className="btn btn-warning me-2">Update</button>
+                       </Link>
+   
+                       <button
+                         className="btn btn-danger"
+                         onClick={() => handleDelete(tour._id)}
+                       >
+                         Delete
+                       </button>
+                     </div>
+                   </div>
+                 </div>
+               </div>
+             ))}
+           </div>
+         ) : (
+           <div className="text-center">
+             <p>No tours available. Create one to get started!</p>
+           </div>
+         )}
+       </div>
+      )
+   
   );
 };
 

@@ -9,6 +9,7 @@ const LoginSignup = ({setUser}) => {
   const [email,setEmail]=useState();
   const [password,setPassword]=useState();
   const [firstName,setFirstName]=useState();
+  const [loading,setLoading]=useState(false);
   const [lastName,setLastName]=useState();
   const navigate=useNavigate()
 
@@ -17,13 +18,11 @@ const LoginSignup = ({setUser}) => {
     setIsLogin(!isLogin);
   };
 
- 
-        
-  
   const handlesignup=async(e)=>{
        e.preventDefault();
        try {
         if(firstName&&lastName&&email&&password){
+          setLoading(true)
           const response= await axios.post("https://tour-backend-1wsb.onrender.com/users/register",{
             username:`${firstName} ${lastName}`,
             email,
@@ -31,6 +30,7 @@ const LoginSignup = ({setUser}) => {
            });
           console.log(response.data)
           setUser(response.data)
+          setLastName(false)
            toast.success("Register Successfuly")
            navigate('/')
         }
@@ -49,8 +49,10 @@ const LoginSignup = ({setUser}) => {
           email,
           password
         }
+        setLoading(true)
         const response=await axios.get("https://tour-backend-1wsb.onrender.com/users/login",{params});
         setUser(response.data)
+        setLoading(false)
         console.log(response.data)
         toast.success("Login Successfuly")
         navigate('/')
@@ -61,7 +63,12 @@ const LoginSignup = ({setUser}) => {
   }
 
   return (
-    <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
+    loading?( <div className="d-flex justify-content-center align-items-center vh-100">
+      <div className="spinner-border text-primary" role="status">
+        <span className="visually-hidden">Loading...</span>
+      </div>
+    </div>):(
+      <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
       <div className="card p-4 shadow-sm" style={{ width: '100%', maxWidth: '500px' }}>
         <h2 className="text-center">{isLogin ? 'Login' : 'Signup'}</h2>
         {isLogin ? (
@@ -171,6 +178,8 @@ const LoginSignup = ({setUser}) => {
         </div>
       </div>
     </div>
+    )
+    
   );
 };
 
